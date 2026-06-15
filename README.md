@@ -168,3 +168,208 @@ FROM bank_loan_data
 GROUP BY grade
 ```
 
+### 📈 KPI Analysis
+
+#### Total Loan Applications
+```sql
+SELECT COUNT(*) AS Total_Loan
+FROM bank_loan_data
+```
+#### Total Loan Amount
+```sql
+SELECT SUM(loan_amount) AS Total_Loan_Amount
+FROM bank_loan_data
+```
+
+#### Total Amount Received
+```sql
+SELECT SUM(total_payment) AS Total_Amount_Received
+FROM bank_loan_data
+```
+
+#### Average Loan Amount
+```sql
+SELECT AVG(loan_amount) AS Avg_Loan_Amount
+FROM bank_loan_data
+```
+
+#### Average Interest Rate
+```sql
+SELECT AVG(int_rate) AS Avg_Interest_Rate
+FROM bank_loan_data
+```
+
+#### Average Annual Income
+```sql
+SELECT AVG(annual_income) AS Avg_Annual_Income
+FROM bank_loan_data
+```
+
+#### Good Loan Percentage
+```sql
+SELECT
+ROUND(
+    COUNT(CASE WHEN loan_status='Fully Paid' THEN 1 END)
+    *100.0/COUNT(*),2
+) AS Good_Loan_Percentage
+FROM bank_loan_data
+```
+
+#### Good Loan Applications
+```sql
+SELECT COUNT(*) AS Good_Loan_Applications
+FROM bank_loan_data
+WHERE loan_status='Fully Paid'
+```
+
+#### Good Loan Amount Received
+```sql
+SELECT SUM(total_payment) AS Good_Loan_Amount_Received
+FROM bank_loan_data
+WHERE loan_status IN ('Fully Paid','Current')
+```
+
+#### Bad Loan Percentage
+```sql
+SELECT
+ROUND(
+    COUNT(CASE WHEN loan_status='Charged Off' THEN 1 END)
+    *100.0/COUNT(*),2
+) AS Bad_Loan_Percentage
+FROM bank_loan_data
+```
+
+#### Bad Loan Applications
+```sql
+SELECT COUNT(*) AS Bad_Loan_Applications
+FROM bank_loan_data
+WHERE loan_status='Charged Off'
+```
+
+#### Bad Loan Amount Received
+```sql
+SELECT SUM(total_payment) AS Bad_Loan_Amount_Received
+FROM bank_loan_data
+WHERE loan_status='Charged Off'
+```
+
+### 🔍 Advanced Business Analysis
+
+#### Default Rate by Grade
+```sql
+SELECT
+    grade,
+    ROUND(
+        COUNT(CASE WHEN loan_status='Charged Off' THEN 1 END)
+        *100.0/COUNT(*),2
+    ) AS default_rate
+FROM bank_loan_data
+GROUP BY grade
+ORDER BY default_rate DESC
+```
+
+#### Profitability Analysis
+```sql
+SELECT
+    grade,
+    SUM(total_payment)-SUM(loan_amount) AS profit
+FROM bank_loan_data
+GROUP BY grade
+ORDER BY profit DESC
+```
+
+#### Borrower Analysis
+```sql
+SELECT
+    home_ownership,
+    loan_status,
+    COUNT(*) AS loans
+FROM bank_loan_data
+GROUP BY home_ownership, loan_status
+```
+
+#### Income Analysis
+```sql
+SELECT
+    loan_status,
+    AVG(annual_income) AS avg_income
+FROM bank_loan_data
+GROUP BY loan_status
+```
+
+#### Interest Rate Analysis
+```sql
+SELECT
+    loan_status,
+    AVG(int_rate) AS avg_interest_rate
+FROM bank_loan_data
+GROUP BY loan_status
+```
+
+#### Top 5 Largest Loans in Each Grade
+```sql
+SELECT *
+FROM (
+    SELECT *,
+           ROW_NUMBER() OVER (
+               PARTITION BY grade
+               ORDER BY loan_amount DESC
+           ) AS rn
+    FROM bank_loan_data
+) t
+WHERE rn <= 5
+```
+#### State Ranking by Total Loan Amount
+```sql
+SELECT
+    address_state,
+    SUM(loan_amount) AS total_loan_amount,
+    RANK() OVER (
+        ORDER BY SUM(loan_amount) DESC
+    ) AS state_rank
+FROM bank_loan_data
+GROUP BY address_state
+```
+#### Monthly Loan Trend Analysis
+```sql
+SELECT
+    YEAR(issue_date) AS year,
+    MONTH(issue_date) AS month,
+    COUNT(*) AS total_loans,
+    SUM(loan_amount) AS total_amount
+FROM bank_loan_data
+GROUP BY YEAR(issue_date), MONTH(issue_date)
+ORDER BY year, month
+```
+## 💡 Key Insights
+
+- 🏆 California (CA) issued the highest number of loans with 6,894 applications.
+- 💰 Grade B received the highest funded amount totaling $130.7M.
+- 📌 Debt Consolidation was the most common loan purpose with 18,214 applications.
+- ✅ 83.33% of all loans were fully paid.
+- ⚠️ Grade B recorded the highest number of charged-off loans with 1,343 defaults.
+- 🚨 Grade G had the highest default rate at 31.31%, making it the riskiest loan grade.
+- 📈 Grade B generated the highest profit of $10.07M.
+- 👥 Charged-off borrowers had the lowest average annual income ($63.5K).
+- 📊 Charged-off loans had a higher average interest rate (13.88%) than fully paid loans (11.64%).
+
+
+
+
+## ✅ Results & Conclusion
+
+The analysis revealed significant patterns in loan performance, borrower behavior, profitability, and risk. Grade B loans contributed the highest funding volume and profitability, while Grade G loans exhibited the highest default risk. Income and interest rate analyses suggested strong associations with repayment outcomes. These findings can support data-driven lending strategies and improve risk management decisions.
+
+## 🔮 Future Work
+
+- Build predictive loan default models using Machine Learning.
+- Implement borrower risk scoring.
+- Develop real-time portfolio monitoring dashboards.
+- Integrate automated loan performance reporting.
+
+## 👤 Author & Contact
+
+*Sreenandana A*
+
+- 💼 LinkedIn: https://www.linkedin.com/in/sreenandana-a-
+- 📧 Email: sreenandananair03@gmail.com
